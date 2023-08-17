@@ -2,6 +2,6 @@
 
 <div align="center">
 
-<https://hi.auioc.com/banciyuan-archive>
+<https://hi.auioc.org/banciyuan-archive>
 
 </div>
