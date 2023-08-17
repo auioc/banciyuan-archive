@@ -4,5 +4,6 @@
         "MD001": false,
         "MD033": false,
         "MD041": false
-    }
+    },
+    "conventionalCommits.scopes": ["web", "repo"]
 }
