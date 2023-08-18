@@ -11,12 +11,14 @@
 ## 简介
 
 本项目共存档半次元数据：
-
-- [条目](https://hi.auioc.org/banciyuan-archive/#/item/)        ： -1
-- [用户](https://hi.auioc.org/banciyuan-archive/#/user/)        ： -1
-- [条目标签](https://hi.auioc.org/banciyuan-archive/#/itemtag/) ： -1
-- [用户标签](https://hi.auioc.org/banciyuan-archive/#/usertag/) ： -1
-- 图片                                                          ： -1
+|                                                               |           |
+| ------------------------------------------------------------- | --------- |
+| [条目](https://hi.auioc.org/banciyuan-archive/#/item/)        | 3,248,000 |
+| [条目标签](https://hi.auioc.org/banciyuan-archive/#/itemtag/) | 51,177    |
+| [用户](https://hi.auioc.org/banciyuan-archive/#/user/)        | 102,960   |
+| [用户标签](https://hi.auioc.org/banciyuan-archive/#/usertag/) | 88        |
+| 图片                                                          | 1,546,794 |
+| 图片（文件）                                                  | 1,539,844 |
 
 ## 维护
 
