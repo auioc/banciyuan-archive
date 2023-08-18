@@ -4,6 +4,5 @@ temp
 *.py
 
 node_modules
-*lock*
 
 assets/bundle.js

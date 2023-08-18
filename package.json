@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "build": "browserify src\\index.ts -p tsify -o assets\\bundle.js",
+        "build": "browserify src/index.ts -p tsify -o assets/bundle.js",
         "watch": "watchify src\\index.ts --debug -p tsify -o assets\\bundle.js"
     },
     "author": "",
