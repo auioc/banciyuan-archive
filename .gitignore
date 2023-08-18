@@ -2,3 +2,8 @@ temp
 
 *.db*
 *.py
+
+node_modules
+*lock*
+
+assets/bundle.js

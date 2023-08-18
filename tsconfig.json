@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "baseUrl": "./src",
+        "esModuleInterop": true,
+        "lib": ["ESNext", "DOM"],
+        "module": "CommonJS",
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "removeComments": true,
+        "rootDir": "./src",
+        "sourceMap": true,
+        "strictFunctionTypes": true,
+        "target": "ESNext"
+    },
+    "include": ["./src/**/*"]
+}

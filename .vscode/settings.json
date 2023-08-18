@@ -1,9 +1,9 @@
 {
-    "cSpell.words": ["banciyuan", "ganswer", "utags"],
+    "cSpell.words": ["banciyuan", "ganswer", "utags", "tsify"],
     "markdownlint.config": {
         "MD001": false,
         "MD033": false,
         "MD041": false
     },
-    "conventionalCommits.scopes": ["web", "repo"]
+    "conventionalCommits.scopes": ["web", "repo", "data"]
 }
