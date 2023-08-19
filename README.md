@@ -4,8 +4,6 @@
 
 <https://hi.auioc.org/banciyuan-archive>
 
-注意：本项目尚未完成，数据仍在整理中！
-
 </div>
 
 ## 简介
