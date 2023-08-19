@@ -130,8 +130,8 @@ onLoadDetailPage('usertag', 'User Tag Detail', (data) => {
         trS(thS('NAME'), tdS(data.name))
     );
     const table2 = tableS(
-        trS(thS(`ITEMS (${data.items.length})`)),
-        trS(tdS([...data.items].map(linkItem).join(', ')))
+        trS(thS(`USERS (${data.users.length})`)),
+        trS(tdS([...data.users].map(linkUser).join(', ')))
     );
     return table1 + table2;
 });
