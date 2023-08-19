@@ -18,6 +18,10 @@ export function chunkArray<T>(array: T[], size: number) {
     return result;
 }
 
+export function percentage(a: number, b = 100, dp = 2) {
+    return ((a / b) * 100).toFixed(dp);
+}
+
 export function formatTime(ts: number) {
     if (ts <= 0) {
         return '0';
@@ -30,6 +34,28 @@ export function formatTime(ts: number) {
     let mm = date.getMinutes().toString().padStart(2, '00');
     let ss = date.getSeconds().toString().padStart(2, '00');
     return y + '-' + m + '-' + d + ' ' + hh + ':' + mm + ':' + ss;
+}
+
+const _SIZE_PREFIX = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+const SIZE_UNITS_IEC = _SIZE_PREFIX.map((s) => s + 'iB');
+const SIZE_UNITS_SI = _SIZE_PREFIX.map((s) => s + 'B');
+
+export function formatSize(bytes: number, iec = true, dp = 1) {
+    const thresh = iec ? 1024 : 1000;
+    if (Math.abs(bytes) < thresh) {
+        return bytes + ' B';
+    }
+    const units = iec ? SIZE_UNITS_IEC : SIZE_UNITS_SI;
+    const r = 10 ** dp;
+    let u = -1;
+    do {
+        bytes /= thresh;
+        ++u;
+    } while (
+        Math.round(Math.abs(bytes) * r) / r >= thresh &&
+        u < units.length - 1
+    );
+    return bytes.toFixed(dp) + ' ' + units[u];
 }
 
 export function parseTsv(tsv: string) {

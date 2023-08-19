@@ -1,4 +1,4 @@
-import { hashpath, loadPage } from './utils';
+import { formatSize, hashpath, loadPage, percentage } from './utils';
 
 export class NotOkResponseError extends Error {
     status;
@@ -12,6 +12,12 @@ export class NotOkResponseError extends Error {
 
 export let ABORT_CONTROLLER = new AbortController();
 
+let _acceptCompressed = true;
+
+export function acceptCompressed(accept: boolean) {
+    _acceptCompressed = accept;
+}
+
 export function onFetchError(error: Error) {
     console.error(error, { error });
     if (error instanceof NotOkResponseError) {
@@ -24,7 +30,9 @@ export function onFetchError(error: Error) {
 }
 
 export function onFetchProgress(received: number, length: number) {
-    loadPage(`Fetching... ${((received / length) * 100).toFixed(2)}%`);
+    const s = formatSize(received) + (length ? ' / ' + formatSize(length) : '');
+    const p = length ? '@ ' + percentage(received, length) + '%' : '';
+    loadPage(`Fetching... ${s} ${p}`);
 }
 
 export async function httpget(
@@ -36,16 +44,22 @@ export async function httpget(
 ) {
     ABORT_CONTROLLER = new AbortController();
     try {
-        const response = await fetch(url, {
-            ...options,
+        const inti = {
             ...{ signal: ABORT_CONTROLLER.signal },
-        });
+            ...options,
+        };
+        if (!_acceptCompressed) {
+            inti['headers'] = { ...inti['headers'], ...{ Range: 'bytes=0-' } };
+        }
+        const response = await fetch(url, inti);
         if (!response.ok) {
             throw new NotOkResponseError(response.status, response.statusText);
         }
 
         const reader = response.body.getReader();
-        const length = +response.headers.get('Content-Length');
+        const length = response.headers.get('Content-Encoding')
+            ? 0
+            : +response.headers.get('Content-Length');
 
         let received = 0;
         let chunks = [];
