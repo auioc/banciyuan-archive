@@ -1,7 +1,5 @@
 import { LoadIndexEvent } from './events';
-import { TYPE } from './main';
-
-export type StringKV = { [x: string]: string };
+import { TYPE } from './types';
 
 export function hashpath(path?: string) {
     if (path) {
@@ -58,18 +56,17 @@ export function formatSize(bytes: number, iec = true, dp = 1) {
     return bytes.toFixed(dp) + ' ' + units[u];
 }
 
-export function parseTsv(tsv: string) {
+export function parseTsv<T>(
+    tsv: string,
+    handler: (headers: string[], cells: string[]) => T
+) {
     const lines = tsv.trim().split(/\r\n|\n/);
     const headers = lines[0].split('\t');
     const rows = lines.slice(1);
     const result = [];
     for (let i = 0; i < rows.length; i++) {
         const cells = rows[i].trim().split('\t');
-        const row: StringKV = {};
-        for (let j = 0; j < cells.length; j++) {
-            row[headers[j]] = cells[j];
-        }
-        result.push(row);
+        result.push(handler(headers, cells));
     }
     return result;
 }
@@ -93,7 +90,10 @@ export function loadPage(content: string | HTMLElement, title?: string) {
     }
 }
 
-export function pagedTitle(title: string, event: LoadIndexEvent) {
+export function pagedTitle<T extends TYPE>(
+    title: string,
+    event: LoadIndexEvent<T>
+) {
     return `${title} (Page ${event.page})`;
 }
 
@@ -110,11 +110,11 @@ export function linkIndexPage(
     );
 }
 
-export function createIndexTable(
-    type: TYPE,
+export function createIndexTable<T extends TYPE>(
+    type: T,
     headers: string[],
-    event: LoadIndexEvent,
-    handler: (item: any) => HTMLTableCellElement[]
+    event: LoadIndexEvent<T>,
+    handler: (data: any) => HTMLTableCellElement[]
 ) {
     const table = document.createElement('table');
     table.className = 'table index-table';
@@ -134,7 +134,7 @@ export function createIndexTable(
     table.append(pageNav());
     table.append(trH(...headers.map((s) => thH(s))));
     event.data
-        .map((item) => trH(...handler(item)))
+        .map((data) => trH(...handler(data)))
         .forEach((row) => table.append(row));
     table.append(pageNav());
     return table;
@@ -160,14 +160,14 @@ export function trH(...cells: HTMLTableCellElement[]) {
     tr.append(...cells);
     return tr;
 }
-export function tdH(html: string, colSpan = 0, rowSpan = 0) {
+export function tdH(html: any, colSpan = 0, rowSpan = 0) {
     const td = document.createElement('td');
     td.innerHTML = html;
     if (colSpan) td.colSpan = colSpan;
     if (rowSpan) td.rowSpan = rowSpan;
     return td;
 }
-export function thH(html: string, colSpan = 0, rowSpan = 0) {
+export function thH(html: any, colSpan = 0, rowSpan = 0) {
     const th = document.createElement('th');
     th.innerHTML = html;
     if (colSpan) th.colSpan = colSpan;
@@ -178,14 +178,16 @@ export function thH(html: string, colSpan = 0, rowSpan = 0) {
 export function trS(...cells: string[]) {
     return '<tr>' + cells.join('') + '</tr>';
 }
-export function tdS(text: string) {
+export function tdS(text: any) {
     return '<td>' + text + '</td>';
 }
-export function thS(text: string) {
+export function thS(text: any) {
     return '<th>' + text + '</th>';
 }
 
-export function hashlink(type: TYPE, id: string) {
+function hashlink(type: TYPE, id: string): string;
+function hashlink(type: TYPE, id: number): string;
+function hashlink(type: TYPE, id: any) {
     if (parseInt(id) < 0) {
         return `<a>${id}</a>`;
     }
@@ -194,12 +196,12 @@ export function hashlink(type: TYPE, id: string) {
 export function linkItem(id: string) {
     return hashlink('item', id);
 }
-export function linkUser(id: string) {
+export function linkUser(id: number) {
     return hashlink('user', id);
 }
-export function linkItemTag(id: string) {
+export function linkItemTag(id: number) {
     return hashlink('itemtag', id);
 }
-export function linkUserTag(id: string) {
+export function linkUserTag(id: number) {
     return hashlink('usertag', id);
 }

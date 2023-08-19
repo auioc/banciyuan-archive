@@ -1,66 +1,57 @@
-import { TYPE } from './main';
+import { DetailData, IndexData, TYPE } from './types';
 import { createIndexTable, loadPage, pagedTitle } from './utils';
 
-type LoadIndexEventType = `loadindex${TYPE}`;
-type LoadDetailEventType = `loaddetail${TYPE}`;
+type EventType<T extends TYPE> = {
+    loadindex: LoadIndexEvent<T>;
+    loaddetail: LoadDetailEvent<T>;
+};
 
-type EventMap = {
-    [k in LoadIndexEventType]: LoadIndexEvent;
-} & { [k in LoadDetailEventType]: LoadDetailEvent };
-
-export class LoadIndexEvent extends Event {
+export class LoadIndexEvent<T extends TYPE> extends Event {
     data;
     page;
     pages;
-    constructor(
-        type: LoadIndexEventType,
-        data: any[],
-        page: number,
-        pages: number
-    ) {
-        super(type);
+    constructor(type: T, data: IndexData[T][], page: number, pages: number) {
+        super(`loadindex${type}`);
         this.data = data;
         this.page = page;
         this.pages = pages;
     }
 }
 
-export class LoadDetailEvent extends Event {
+export class LoadDetailEvent<T extends TYPE> extends Event {
     id;
     data;
-    constructor(type: LoadDetailEventType, id: string, data: any) {
-        super(type);
+    constructor(type: T, id: string, data: DetailData[T]) {
+        super(`loaddetail${type}`);
         this.id = id;
         this.data = data;
     }
 }
 
 export class EventTargetElement extends HTMLElement {
-    public addEventListener<T extends keyof EventMap>(
-        type: T,
-        listener: (this: EventTargetElement, event: EventMap[T]) => any,
+    public listen<T extends TYPE, E extends keyof EventType<T>>(
+        eventType: E,
+        dataType: T,
+        listener: (this: EventTargetElement, event: EventType<T>[E]) => any,
         options?: boolean | AddEventListenerOptions
-    ): void;
-    public addEventListener(
-        type: string,
-        listener: (this: EventTargetElement, event: Event) => any,
-        options?: boolean | AddEventListenerOptions
-    ): void {
-        super.addEventListener(type, listener, options);
+    ) {
+        //@ts-expect-error
+        super.addEventListener(eventType + dataType, listener, options);
     }
 }
 window.customElements.define('event-target', EventTargetElement);
 
-export const EVENT_TARGET: EventTargetElement =
-    document.createElement('event-target');
+export const EVENT_TARGET = document.createElement(
+    'event-target'
+) as EventTargetElement;
 
-export function onLoadIndexPage(
-    type: TYPE,
+export function onLoadIndexPage<T extends TYPE>(
+    type: T,
     name: string,
     headers: string[],
-    handler: (item: any) => HTMLTableCellElement[]
+    handler: (data: IndexData[T]) => HTMLTableCellElement[]
 ) {
-    EVENT_TARGET.addEventListener(`loadindex${type}`, (event) => {
+    EVENT_TARGET.listen('loadindex', type, (event) => {
         loadPage(
             createIndexTable(type, headers, event, handler),
             pagedTitle(name, event)
@@ -68,12 +59,12 @@ export function onLoadIndexPage(
     });
 }
 
-export function onLoadDetailPage(
-    type: TYPE,
+export function onLoadDetailPage<T extends TYPE>(
+    type: T,
     name: string,
-    handler: (data: any) => string
+    handler: (data: DetailData[T]) => string
 ) {
-    EVENT_TARGET.addEventListener(`loaddetail${type}`, (event) => {
+    EVENT_TARGET.listen('loaddetail', type, (event) => {
         loadPage(handler(event.data), name + ' ' + event.id);
     });
 }
