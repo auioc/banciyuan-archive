@@ -1,5 +1,5 @@
 {
-    "cSpell.words": ["banciyuan", "ganswer", "utags", "tsify"],
+    "cSpell.words": ["banciyuan", "ganswer", "tsify", "utags"],
     "markdownlint.config": {
         "MD001": false,
         "MD033": false,
