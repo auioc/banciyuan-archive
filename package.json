@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "build": "browserify src/index.ts -p tsify | terser -c ecma=2017 > assets/bundle.js",
-        "watch": "watchify src/index.ts --debug -p tsify -o assets/bundle.js"
+        "build": "browserify src/main.ts -p tsify | terser -c ecma=2017 > assets/bundle.js",
+        "watch": "watchify src/main.ts --debug -p tsify -o assets/bundle.js"
     },
     "author": "",
     "license": "AGPL-3.0-or-later",

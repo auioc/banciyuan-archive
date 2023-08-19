@@ -17,16 +17,13 @@ header {
     padding: 1em 5em 0.5em 5em;
     text-align: center;
 }
-
 header h1,
 header h2 {
     margin: 0;
 }
-
 header h2#page-title {
     font-size: 1em;
 }
-
 header nav {
     margin: 0.3em 0;
 }
@@ -51,16 +48,29 @@ main#main {
 div#content {
     width: 100%;
 }
+#content svg.octicon-link {
+    display: none;
+}
 
 table.table {
     width: 100%;
     margin-bottom: 1em;
 }
-
 table.table,
 table.table td,
 table.table th {
     border: 1px black solid;
     border-collapse: collapse;
     padding: 2px 4px;
+}
+
+table.index-table .page-nav {
+    text-align: center;
+}
+table.index-table .page-nav a.link-index-page {
+    margin: 0 0.5em;
+    text-decoration: none;
+}
+table.index-table .page-nav span {
+    margin: 0 2em;
 }

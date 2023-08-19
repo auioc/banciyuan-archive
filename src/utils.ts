@@ -1,0 +1,179 @@
+import { LoadIndexEvent } from './events';
+import { TYPE } from './main';
+
+export type StringKV = { [x: string]: string };
+
+export function hashpath(path?: string) {
+    if (path) {
+        window.location.hash = path;
+    }
+    return window.location.hash.replace(/^#/, '');
+}
+
+export function chunkArray<T>(array: T[], size: number) {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
+    }
+    return result;
+}
+
+export function formatTime(ts: number) {
+    if (ts <= 0) {
+        return '0';
+    }
+    let date = new Date(ts * 1000);
+    let y = date.getFullYear().toString();
+    let m = (date.getMonth() + 1).toString().padStart(2, '00');
+    let d = date.getDate().toString().padStart(2, '00');
+    let hh = date.getHours().toString().padStart(2, '00');
+    let mm = date.getMinutes().toString().padStart(2, '00');
+    let ss = date.getSeconds().toString().padStart(2, '00');
+    return y + '-' + m + '-' + d + ' ' + hh + ':' + mm + ':' + ss;
+}
+
+export function parseTsv(tsv: string) {
+    const lines = tsv.trim().split(/\r\n|\n/);
+    const headers = lines[0].split('\t');
+    const rows = lines.slice(1);
+    const result = [];
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].trim().split('\t');
+        const row: StringKV = {};
+        for (let j = 0; j < cells.length; j++) {
+            row[headers[j]] = cells[j];
+        }
+        result.push(row);
+    }
+    return result;
+}
+
+const DEFAULT_TITLE = document.title;
+export function loadPage(content: string | HTMLElement, title?: string) {
+    const contentEl = document.getElementById('content');
+    contentEl.innerHTML = '';
+    if (content instanceof HTMLElement) {
+        contentEl.append(content);
+    } else if (content) {
+        contentEl.innerHTML = content;
+    }
+    const titleEl = document.getElementById('page-title');
+    titleEl.innerHTML = '&nbsp;';
+    if (title) {
+        document.title = title + ' - ' + DEFAULT_TITLE;
+        titleEl.innerHTML = title;
+    } else {
+        document.title = DEFAULT_TITLE;
+    }
+}
+
+export function pagedTitle(title: string, event: LoadIndexEvent) {
+    return `${title} (Page ${event.page})`;
+}
+
+export function linkIndexPage(
+    type: TYPE,
+    page = 1,
+    text: string | number = page,
+    enabled = true
+) {
+    return (
+        '<a class="link-index-page" href="' +
+        (enabled ? `#/${type}/?page=${page}` : 'javascript:void(0)') +
+        `">${text}</a>`
+    );
+}
+
+export function createIndexTable(
+    type: TYPE,
+    headers: string[],
+    event: LoadIndexEvent,
+    handler: (item: any) => HTMLTableCellElement[]
+) {
+    const table = document.createElement('table');
+    table.className = 'table index-table';
+    const pageNav = () => {
+        const page = event.page;
+        const pages = event.pages;
+        const text =
+            linkIndexPage(type, 1, '&lt;&lt;', page > 1) +
+            linkIndexPage(type, page - 1, '&lt;', page > 1) +
+            `<span> ${page} / ${pages} </span>` +
+            linkIndexPage(type, page + 1, '&gt;', page < pages) +
+            linkIndexPage(type, pages, '&gt;&gt;', page < pages);
+        const td = tdH(text, headers.length);
+        td.className = 'page-nav';
+        return trH(td);
+    };
+    table.append(pageNav());
+    table.append(trH(...headers.map((s) => thH(s))));
+    event.data
+        .map((item) => trH(...handler(item)))
+        .forEach((row) => table.append(row));
+    table.append(pageNav());
+    return table;
+}
+
+export function tableH(headers: string[], rows: HTMLTableRowElement[]) {
+    const table = document.createElement('table');
+    table.className = 'table';
+    if (headers) {
+        table.append(trH(...headers.map((s) => thH(s))));
+    }
+    if (rows) {
+        rows.forEach((row) => table.append(row));
+    }
+    return table;
+}
+export function tableS(...rows: string[]) {
+    return '<table class="table"><tbody>' + rows.join('') + '</tbody></table>';
+}
+
+export function trH(...cells: HTMLTableCellElement[]) {
+    const tr = document.createElement('tr');
+    tr.append(...cells);
+    return tr;
+}
+export function tdH(html: string, colSpan = 0, rowSpan = 0) {
+    const td = document.createElement('td');
+    td.innerHTML = html;
+    if (colSpan) td.colSpan = colSpan;
+    if (rowSpan) td.rowSpan = rowSpan;
+    return td;
+}
+export function thH(html: string, colSpan = 0, rowSpan = 0) {
+    const th = document.createElement('th');
+    th.innerHTML = html;
+    if (colSpan) th.colSpan = colSpan;
+    if (rowSpan) th.rowSpan = rowSpan;
+    return th;
+}
+
+export function trS(...cells: string[]) {
+    return '<tr>' + cells.join('') + '</tr>';
+}
+export function tdS(text: string) {
+    return '<td>' + text + '</td>';
+}
+export function thS(text: string) {
+    return '<th>' + text + '</th>';
+}
+
+export function hashlink(type: TYPE, id: string) {
+    if (parseInt(id) < 0) {
+        return `<a>${id}</a>`;
+    }
+    return `<a href="#/${type}/${id}">${id}</a>`;
+}
+export function linkItem(id: string) {
+    return hashlink('item', id);
+}
+export function linkUser(id: string) {
+    return hashlink('user', id);
+}
+export function linkItemTag(id: string) {
+    return hashlink('itemtag', id);
+}
+export function linkUserTag(id: string) {
+    return hashlink('usertag', id);
+}
