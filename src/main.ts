@@ -19,6 +19,7 @@ const REGEX_PATH = /^\/(item|user|itemtag|usertag)\/(\?page=)?(\d*)$/;
 const REGEX_PAGE = /^\?page=(\d*)$/;
 
 const INDEX_CACHE: { [x in TYPE]?: any[] } = {};
+const DETAIL_CACHE: { [x in TYPE]?: { [x in string]?: any } } = {};
 
 function loadIndex(type: TYPE, page = 1) {
     if (type in INDEX_CACHE) {
@@ -47,11 +48,23 @@ function loadIndex(type: TYPE, page = 1) {
 }
 
 function loadDetail(type: TYPE, id: string) {
-    httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) =>
-        EVENT_TARGET.dispatchEvent(
-            new LoadDetailEvent(`loaddetail${type}`, id, JSON.parse(text))
-        )
-    );
+    if (type in DETAIL_CACHE) {
+        const cache = DETAIL_CACHE[type];
+        if (id in cache) {
+            console.debug('cached', type, id, cache[id]);
+            EVENT_TARGET.dispatchEvent(
+                new LoadDetailEvent(`loaddetail${type}`, id, cache[id])
+            );
+            return;
+        }
+    } else {
+        DETAIL_CACHE[type] = {};
+    }
+    console.debug('nocache', type, id);
+    httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
+        DETAIL_CACHE[type][id] = JSON.parse(text);
+        loadDetail(type, id);
+    });
 }
 
 function hashChange() {
