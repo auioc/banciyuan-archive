@@ -14,15 +14,17 @@ import {
 
 export function initHandlers() {}
 
-const ITEM_TYPES = ['unknown', 'note', 'article', 'video', 'ganswer'];
-const USER_SEX = ['unknown', 'male', 'female'];
-const ITEM_TAG_TYPES = ['unknown', 'tag', 'work', 'event'];
+const ITEM_TYPES = ['', 'note', 'article', 'video', 'ganswer'];
+const USER_SEX = ['', 'male', 'female'];
+const ITEM_TAG_TYPES = ['', 'tag', 'work', 'event'];
+const IMAGE_FORMATS = ['', 'jpeg', 'png', 'gif', 'bmp', 'heic', 'tiff', 'webp'];
 
 const _pKv = (array: string[], i: number) =>
     array[i > 0 && i < array.length ? i : 0];
 const getItemType = (i: number) => _pKv(ITEM_TYPES, i);
 const getSex = (i: number) => _pKv(USER_SEX, i);
 const getTagType = (i: number) => _pKv(ITEM_TAG_TYPES, i);
+const getImageFormat = (i: number) => _pKv(IMAGE_FORMATS, i);
 
 onLoadIndexPage(
     'item',
@@ -53,16 +55,17 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
         trS(thS('CONTENT'), `<td colspan="3">${data.content}</td>`)
     );
     const table2 = tableS(
-        trS(`<th colspan="4">IMAGES (${data.images.length})</th>`),
-        trS(thS('ID'), thS('NAME'), thS('WIDTH'), thS('HEIGHT')),
+        trS(`<th colspan="5">IMAGES (${data.images.length})</th>`),
+        trS(thS('ID'), thS('NAME'), thS('FORMAT'), thS('WIDTH'), thS('HEIGHT')),
         (() =>
             [...data.images]
                 .map((image) =>
                     trS(
-                        tdS(image.id),
+                        tdS(image.id < 0 ? '' : image.id),
                         tdS(image.name),
-                        tdS(image.w),
-                        tdS(image.h)
+                        tdS(getImageFormat(image.format)),
+                        tdS(image.w > 0 ? image.w : ''),
+                        tdS(image.h > 0 ? image.h : '')
                     )
                 )
                 .join(''))()
