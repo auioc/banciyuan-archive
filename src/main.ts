@@ -1,8 +1,14 @@
+import {
+    getDetailCache,
+    getIndexCache,
+    loadIndexCache,
+    setDetailCache,
+} from './cache';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
 import { ABORT_CONTROLLER, httpget, loadGitHubReadme } from './fetch';
-import { INDEX_HANDLERS, initHandlers } from './handlers';
-import { DetailData, IndexData, TYPE } from './types';
-import { chunkArray, hashpath, loadPage, parseTsv } from './utils';
+import { initHandlers } from './handlers';
+import { TYPE } from './types';
+import { hashpath, loadPage } from './utils';
 
 declare global {
     interface Window {
@@ -16,46 +22,34 @@ initHandlers();
 const REGEX_PATH = /^\/(item|user|itemtag|usertag)\/(\?page=)?(\d*)$/;
 const REGEX_PAGE = /^\?page=(\d*)$/;
 
-const INDEX_CACHE: { [t in TYPE]?: IndexData[t][][] } = {};
-const DETAIL_CACHE: { [t in TYPE]?: { [i in string]?: DetailData[t] } } = {};
-
 function loadIndex<T extends TYPE>(type: T, page = 1) {
-    if (type in INDEX_CACHE) {
+    const cache = getIndexCache(type);
+    if (cache) {
         const _page = page - 1;
-        const data = INDEX_CACHE[type];
-        if (_page >= 0 && _page < data.length) {
+        const chunked = cache.chunked;
+        if (_page >= 0 && _page < chunked.length) {
             EVENT_TARGET.dispatchEvent(
-                new LoadIndexEvent(type, data[_page], page, data.length)
+                new LoadIndexEvent(type, chunked[_page], page, chunked.length)
             );
         } else {
             alert('Invalid page: ' + page);
             hashpath('/' + type + '/?page=1');
         }
     } else {
-        httpget(`${window.DATA_BASE_URL}/${type}s/index.tsv`, {}, (text) => {
-            const data = chunkArray(parseTsv(text, INDEX_HANDLERS[type]), 100);
-            (INDEX_CACHE[type] as IndexData[T][][]) = data;
-            loadIndex(type, page);
-        });
+        alert('ERROR');
     }
 }
 
 function loadDetail(type: TYPE, id: string) {
-    if (type in DETAIL_CACHE) {
-        const cache = DETAIL_CACHE[type];
-        if (id in cache) {
-            EVENT_TARGET.dispatchEvent(
-                new LoadDetailEvent(type, id, cache[id])
-            );
-            return;
-        }
+    const cache = getDetailCache(type, id);
+    if (cache) {
+        EVENT_TARGET.dispatchEvent(new LoadDetailEvent(type, id, cache));
     } else {
-        DETAIL_CACHE[type] = {};
+        httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
+            setDetailCache(type, id, JSON.parse(text));
+            loadDetail(type, id);
+        });
     }
-    httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
-        DETAIL_CACHE[type][id] = JSON.parse(text);
-        loadDetail(type, id);
-    });
 }
 
 function hashChange() {
@@ -88,5 +82,10 @@ function hashChange() {
     }
 }
 
-hashChange();
-window.addEventListener('hashchange', hashChange);
+(async () => {
+    if (!hashpath()) hashpath('/');
+    loadPage('Initializing...');
+    await loadIndexCache();
+    hashChange();
+    window.addEventListener('hashchange', hashChange);
+})();
