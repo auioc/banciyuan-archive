@@ -1,4 +1,3 @@
-import { getIndexCache } from './cache';
 import { LoadIndexEvent } from './events';
 import { TYPE } from './types';
 
@@ -184,25 +183,4 @@ export function tdS(text: any) {
 }
 export function thS(text: any) {
     return '<th>' + text + '</th>';
-}
-
-function hashlink(type: TYPE, id: string): string;
-function hashlink(type: TYPE, id: number, text?: string): string;
-function hashlink(type: TYPE, id: any, text = id) {
-    if (parseInt(id) < 0) {
-        return `<a>${text}</a>`;
-    }
-    return `<a href="#/${type}/${id}">${text}</a>`;
-}
-export function linkItem(id: string) {
-    return hashlink('item', id);
-}
-export function linkUser(id: number) {
-    return hashlink('user', id, getIndexCache('user').dict[id].name);
-}
-export function linkItemTag(id: number) {
-    return hashlink('itemtag', id, getIndexCache('itemtag').dict[id].name);
-}
-export function linkUserTag(id: number) {
-    return hashlink('usertag', id, getIndexCache('usertag').dict[id].name);
 }

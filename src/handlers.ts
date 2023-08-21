@@ -1,17 +1,7 @@
+import { getIndexCache } from './cache';
 import { onLoadDetailPage, onLoadIndexPage } from './events';
 import { IndexData, TYPE } from './types';
-import {
-    formatTime,
-    linkItem,
-    linkItemTag,
-    linkUser,
-    linkUserTag,
-    tableS,
-    tdH,
-    tdS,
-    thS,
-    trS,
-} from './utils';
+import { formatTime, tableS, tdH, tdS, thS, trS } from './utils';
 
 export function initHandlers() {}
 
@@ -78,7 +68,13 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
         trS(
             thS('TAGS'),
             `<td colspan="3">${[...data.tags]
-                .map(linkItemTag)
+                .map((id) =>
+                    hashlink(
+                        'itemtag',
+                        id,
+                        getIndexCache('itemtag').dict[id].name
+                    )
+                )
                 .join(',&nbsp;')}</td>`
         ),
         trS(thS('CONTENT'), `<td colspan="3">${data.content}</td>`)
@@ -107,7 +103,7 @@ onLoadIndexPage(
     'User Index',
     ['ID', 'NAME', 'SEX', 'COUNT'],
     (user) => [
-        tdH(linkUser(user.id)),
+        tdH(hashlink('user', user.id)),
         tdH(user.name),
         tdH(getSex(user.sex)),
         tdH(user.count),
@@ -118,7 +114,20 @@ onLoadDetailPage('user', 'User Detail', (data) => {
         trS(thS('ID'), tdS(data.id)),
         trS(thS('NAMES'), tdS(data.names.join(',&nbsp;'))),
         trS(thS('SEX'), tdS(getSex(data.sex))),
-        trS(thS('TAGS'), tdS([...data.tags].map(linkUserTag).join(',&nbsp;')))
+        trS(
+            thS('TAGS'),
+            tdS(
+                [...data.tags]
+                    .map((id) =>
+                        hashlink(
+                            'usertag',
+                            id,
+                            getIndexCache('usertag').dict[id].name
+                        )
+                    )
+                    .join(',&nbsp;')
+            )
+        )
     );
     const table2 = tableS(
         trS(thS(`ITEMS (${data.items.length})`)),
@@ -132,7 +141,7 @@ onLoadIndexPage(
     'Item Tag Index',
     ['ID', 'NAME', 'TYPE', 'COUNT'],
     (tag) => [
-        tdH(linkItemTag(tag.id)),
+        tdH(hashlink('itemtag', tag.id)),
         tdH(tag.name),
         tdH(getTagType(tag.type)),
         tdH(tag.count),
@@ -152,7 +161,7 @@ onLoadDetailPage('itemtag', 'Item Tag Detail', (data) => {
 });
 
 onLoadIndexPage('usertag', 'User Tag Index', ['ID', 'NAME', 'COUNT'], (tag) => [
-    tdH(linkUserTag(tag.id)),
+    tdH(hashlink('usertag', tag.id)),
     tdH(tag.name),
     tdH(tag.count),
 ]);
@@ -167,3 +176,18 @@ onLoadDetailPage('usertag', 'User Tag Detail', (data) => {
     );
     return table1 + table2;
 });
+
+function hashlink(type: TYPE, id: string): string;
+function hashlink(type: TYPE, id: number, text?: string): string;
+function hashlink(type: TYPE, id: any, text = id) {
+    if (parseInt(id) < 0) {
+        return `<a>${text}</a>`;
+    }
+    return `<a href="#/${type}/${id}">${text}</a>`;
+}
+function linkItem(id: string) {
+    return hashlink('item', id);
+}
+function linkUser(id: number) {
+    return hashlink('user', id, getIndexCache('user').dict[id].name);
+}
