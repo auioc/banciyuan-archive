@@ -15,7 +15,7 @@
 | [条目标签](https://hi.auioc.org/banciyuan-archive/#/itemtag/) | 51,177    |
 | [用户](https://hi.auioc.org/banciyuan-archive/#/user/)        | 102,960   |
 | [用户标签](https://hi.auioc.org/banciyuan-archive/#/usertag/) | 88        |
-| 图片                                                          | 1,546,794 |
+| 图片                                                          | 1,545,362 |
 | 图片（文件）                                                  | 1,539,844 |
 
 ## 维护
