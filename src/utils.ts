@@ -38,7 +38,7 @@ const _SIZE_PREFIX = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
 const SIZE_UNITS_IEC = _SIZE_PREFIX.map((s) => s + 'iB');
 const SIZE_UNITS_SI = _SIZE_PREFIX.map((s) => s + 'B');
 
-export function formatSize(bytes: number, iec = true, dp = 1) {
+export function formatSize(bytes: number, iec = true, dp = 2) {
     const thresh = iec ? 1024 : 1000;
     if (Math.abs(bytes) < thresh) {
         return bytes + ' B';

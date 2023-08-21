@@ -24,10 +24,11 @@ type ItemDetail = {
     tags: number[];
     images: {
         id: number;
+        name: string;
         format: number;
         w: number;
         h: number;
-        name: string;
+        size: number;
     }[];
 };
 

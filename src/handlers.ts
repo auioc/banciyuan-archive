@@ -1,7 +1,7 @@
 import { getIndexCache } from './cache';
 import { onLoadDetailPage, onLoadIndexPage } from './events';
 import { IndexData, TYPE } from './types';
-import { formatTime, tableS, tdH, tdS, thS, trS } from './utils';
+import { formatSize, formatTime, tableS, tdH, tdS, thS, trS } from './utils';
 
 export function initHandlers() {}
 
@@ -80,8 +80,15 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
         trS(thS('CONTENT'), `<td colspan="3">${data.content}</td>`)
     );
     const table2 = tableS(
-        trS(`<th colspan="5">IMAGES (${data.images.length})</th>`),
-        trS(thS('ID'), thS('NAME'), thS('FORMAT'), thS('WIDTH'), thS('HEIGHT')),
+        trS(`<th colspan="6">IMAGES (${data.images.length})</th>`),
+        trS(
+            thS('ID'),
+            thS('NAME'),
+            thS('FORMAT'),
+            thS('WIDTH'),
+            thS('HEIGHT'),
+            thS('SIZE')
+        ),
         (() =>
             [...data.images]
                 .map((image) =>
@@ -90,7 +97,8 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
                         tdS(image.name),
                         tdS(getImageFormat(image.format)),
                         tdS(image.w > 0 ? image.w : ''),
-                        tdS(image.h > 0 ? image.h : '')
+                        tdS(image.h > 0 ? image.h : ''),
+                        tdS(image.size > 0 ? formatSize(image.size) : '')
                     )
                 )
                 .join(''))()
