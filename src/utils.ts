@@ -72,6 +72,7 @@ export function parseTsv<T>(
 }
 
 const DEFAULT_TITLE = document.title;
+
 export function loadPage(content: string | HTMLElement, title?: string) {
     const contentEl = document.getElementById('content');
     contentEl.innerHTML = '';
@@ -90,21 +91,14 @@ export function loadPage(content: string | HTMLElement, title?: string) {
     }
 }
 
-export function pagedTitle<T extends TYPE>(
-    title: string,
-    event: LoadIndexEvent<T>
-) {
-    return `${title} (Page ${event.page})`;
-}
-
-export function linkIndexPage(
+export function linkIndex(
     type: TYPE,
     page = 1,
     text: string | number = page,
     enabled = true
 ) {
     return (
-        '<a class="link-index-page" href="' +
+        '<a class="link-index" href="' +
         (enabled ? `#/${type}/?page=${page}` : 'javascript:void(0)') +
         `">${text}</a>`
     );
@@ -122,11 +116,11 @@ export function createIndexTable<T extends TYPE>(
         const page = event.page;
         const pages = event.pages;
         const text =
-            linkIndexPage(type, 1, '&lt;&lt;', page > 1) +
-            linkIndexPage(type, page - 1, '&lt;', page > 1) +
+            linkIndex(type, 1, '&lt;&lt;', page > 1) +
+            linkIndex(type, page - 1, '&lt;', page > 1) +
             `<span> ${page} / ${pages} </span>` +
-            linkIndexPage(type, page + 1, '&gt;', page < pages) +
-            linkIndexPage(type, pages, '&gt;&gt;', page < pages);
+            linkIndex(type, page + 1, '&gt;', page < pages) +
+            linkIndex(type, pages, '&gt;&gt;', page < pages);
         const td = tdH(text, headers.length);
         td.className = 'page-nav';
         return trH(td);

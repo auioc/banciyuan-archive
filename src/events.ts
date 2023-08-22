@@ -1,5 +1,5 @@
 import { DetailData, IndexData, TYPE } from './types';
-import { createIndexTable, loadPage, pagedTitle } from './utils';
+import { createIndexTable, loadPage } from './utils';
 
 type EventType<T extends TYPE> = {
     loadindex: LoadIndexEvent<T>;
@@ -54,7 +54,7 @@ export function onLoadIndexPage<T extends TYPE>(
     EVENT_TARGET.listen('loadindex', type, (event) => {
         loadPage(
             createIndexTable(type, headers, event, handler),
-            pagedTitle(name, event)
+            `${name} (Page ${event.page})`
         );
     });
 }
