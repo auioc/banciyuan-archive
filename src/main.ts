@@ -17,6 +17,8 @@ declare global {
     }
 }
 
+export const TYPES: TYPE[] = ['item', 'itemtag', 'user', 'usertag'];
+
 initHandlers();
 
 const REGEX_PATH = /^\/(item|user|itemtag|usertag)\/(\?page=)?(\d*)$/;
@@ -53,15 +55,18 @@ function loadDetail(type: TYPE, id: string) {
 }
 
 function hashChange() {
+    const path = hashpath();
+    console.debug('hash change:', path);
     ABORT_CONTROLLER.abort();
     loadPage('Loading...');
-    const path = hashpath();
     if (path === '/') {
+        console.debug('load homepage');
         loadPage('Loading Readme...');
         loadGitHubReadme(window.REPO, loadPage);
         return;
     }
     if (!REGEX_PATH.test(path)) {
+        console.debug('invalid path', path);
         if (path) {
             alert('Invalid path: ' + path);
         }

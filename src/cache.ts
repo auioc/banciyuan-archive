@@ -1,5 +1,6 @@
 import { httpget } from './fetch';
 import { INDEX_HANDLERS } from './handlers';
+import { TYPES } from './main';
 import { DetailData, IndexData, TYPE } from './types';
 import { chunkArray, parseTsv } from './utils';
 
@@ -36,7 +37,7 @@ async function loadIndex<T extends TYPE>(type: T) {
 }
 
 export async function loadIndexCache() {
-    for (const type of ['item', 'itemtag', 'user', 'usertag'] as TYPE[]) {
+    for (const type of TYPES) {
         await loadIndex(type);
     }
 }
