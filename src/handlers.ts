@@ -1,7 +1,7 @@
 import { getIndex } from './data';
 import { onLoadDetailPage, onLoadIndexPage } from './events';
 import { IndexData, TYPE } from './types';
-import { formatSize, formatTime, tableS, tdH, tdS, thS, trS } from './utils';
+import { formatSize, formatTime, tableS, tcRS, tdS, thS } from './utils';
 
 export function initHandlers() {}
 
@@ -10,12 +10,11 @@ const USER_SEX = ['', 'male', 'female'];
 const ITEM_TAG_TYPES = ['', 'tag', 'work', 'event'];
 const IMAGE_FORMATS = ['', 'jpeg', 'png', 'gif', 'bmp', 'heic', 'tiff', 'webp'];
 
-const _pKv = (array: string[], i: number) =>
-    array[i > 0 && i < array.length ? i : 0];
-const getItemType = (i: number) => _pKv(ITEM_TYPES, i);
-const getSex = (i: number) => _pKv(USER_SEX, i);
-const getTagType = (i: number) => _pKv(ITEM_TAG_TYPES, i);
-const getImageFormat = (i: number) => _pKv(IMAGE_FORMATS, i);
+const _kv = (a: string[], i: number) => a[i > 0 && i < a.length ? i : 0];
+const itemType = (i: number) => _kv(ITEM_TYPES, i);
+const sex = (i: number) => _kv(USER_SEX, i);
+const tagType = (i: number) => _kv(ITEM_TAG_TYPES, i);
+const imageFormat = (i: number) => _kv(IMAGE_FORMATS, i);
 
 export const INDEX_HANDLERS: {
     [t in TYPE]: (h: string[], c: string[]) => IndexData[t];
@@ -50,54 +49,53 @@ onLoadIndexPage(
     'Item Index',
     ['ID', 'TYPE', 'USER', 'TIME'],
     (item) => [
-        tdH(linkItem(item.id)),
-        tdH(getItemType(item.type)),
-        tdH(linkUser(item.user)),
-        tdH(formatTime(item.time)),
+        linkItem(item.id),
+        itemType(item.type),
+        linkUser(item.user),
+        formatTime(item.time),
     ]
 );
 onLoadDetailPage('item', 'Item Detail', (data) => {
     const table1 = tableS(
-        trS(thS('ID'), tdS(data.id), thS('TYPE'), tdS(getItemType(data.type))),
-        trS(
+        [thS('ID'), tdS(data.id), thS('TYPE'), tdS(itemType(data.type))],
+        [
             thS('TIME'),
             tdS(formatTime(data.time)),
             thS('USER'),
-            tdS(linkUser(data.user))
-        ),
-        trS(
+            tdS(linkUser(data.user)),
+        ],
+        [
             thS('TAGS'),
-            `<td colspan="3">${[...data.tags]
-                .map((id) =>
-                    hashlink('itemtag', id, getIndex('itemtag').dict[id].name)
-                )
-                .join(',&nbsp;')}</td>`
-        ),
-        trS(thS('CONTENT'), `<td colspan="3">${data.content}</td>`)
+            tdS(
+                [...data.tags]
+                    .map((id) =>
+                        hashlink(
+                            'itemtag',
+                            id,
+                            getIndex('itemtag').dict[id].name
+                        )
+                    )
+                    .join(',&nbsp;'),
+                3
+            ),
+        ],
+        [thS('CONTENT'), tdS(data.content, 3)]
     );
     const table2 = tableS(
-        trS(`<th colspan="6">IMAGES (${data.images.length})</th>`),
-        trS(
-            thS('ID'),
-            thS('NAME'),
-            thS('FORMAT'),
-            thS('WIDTH'),
-            thS('HEIGHT'),
-            thS('SIZE')
-        ),
-        (() =>
-            [...data.images]
-                .map((image) =>
-                    trS(
-                        tdS(image.id < 0 ? '' : image.id),
-                        tdS(image.name),
-                        tdS(getImageFormat(image.format)),
-                        tdS(image.w > 0 ? image.w : ''),
-                        tdS(image.h > 0 ? image.h : ''),
-                        tdS(image.size > 0 ? formatSize(image.size) : '')
-                    )
+        [thS(`IMAGES (${data.images.length})`, 6)],
+        tcRS(true, 'ID', 'NAME', 'FORMAT', 'WIDTH', 'HEIGHT', 'SIZE'),
+        ...(() =>
+            [...data.images].map((image) =>
+                tcRS(
+                    false,
+                    image.id < 0 ? '' : image.id,
+                    image.name,
+                    imageFormat(image.format),
+                    image.w > 0 ? image.w : '',
+                    image.h > 0 ? image.h : '',
+                    image.size > 0 ? formatSize(image.size) : ''
                 )
-                .join(''))()
+            ))()
     );
     return table1 + table2;
 });
@@ -106,19 +104,14 @@ onLoadIndexPage(
     'user',
     'User Index',
     ['ID', 'NAME', 'SEX', 'COUNT'],
-    (user) => [
-        tdH(hashlink('user', user.id)),
-        tdH(user.name),
-        tdH(getSex(user.sex)),
-        tdH(user.count),
-    ]
+    (user) => [hashlink('user', user.id), user.name, sex(user.sex), user.count]
 );
 onLoadDetailPage('user', 'User Detail', (data) => {
     const table1 = tableS(
-        trS(thS('ID'), tdS(data.id)),
-        trS(thS('NAMES'), tdS(data.names.join(',&nbsp;'))),
-        trS(thS('SEX'), tdS(getSex(data.sex))),
-        trS(
+        [thS('ID'), tdS(data.id)],
+        [thS('NAMES'), tdS(data.names.join(',&nbsp;'))],
+        [thS('SEX'), tdS(sex(data.sex))],
+        [
             thS('TAGS'),
             tdS(
                 [...data.tags]
@@ -130,12 +123,12 @@ onLoadDetailPage('user', 'User Detail', (data) => {
                         )
                     )
                     .join(',&nbsp;')
-            )
-        )
+            ),
+        ]
     );
     const table2 = tableS(
-        trS(thS(`ITEMS (${data.items.length})`)),
-        trS(tdS([...data.items].map(linkItem).join(', ')))
+        [thS(`ITEMS (${data.items.length})`)],
+        [tdS([...data.items].map(linkItem).join(', '))]
     );
     return table1 + table2;
 });
@@ -145,38 +138,38 @@ onLoadIndexPage(
     'Item Tag Index',
     ['ID', 'NAME', 'TYPE', 'COUNT'],
     (tag) => [
-        tdH(hashlink('itemtag', tag.id)),
-        tdH(tag.name),
-        tdH(getTagType(tag.type)),
-        tdH(tag.count),
+        hashlink('itemtag', tag.id),
+        tag.name,
+        tagType(tag.type),
+        tag.count,
     ]
 );
 onLoadDetailPage('itemtag', 'Item Tag Detail', (data) => {
     const table1 = tableS(
-        trS(thS('ID'), tdS(data.id)),
-        trS(thS('TYPE'), tdS(getTagType(data.type))),
-        trS(thS('NAME'), tdS(data.name))
+        [thS('ID'), tdS(data.id)],
+        [thS('TYPE'), tdS(tagType(data.type))],
+        [thS('NAME'), tdS(data.name)]
     );
     const table2 = tableS(
-        trS(thS(`ITEMS (${data.items.length})`)),
-        trS(tdS([...data.items].map(linkItem).join(', ')))
+        [thS(`ITEMS (${data.items.length})`)],
+        [tdS([...data.items].map(linkItem).join(', '))]
     );
     return table1 + table2;
 });
 
 onLoadIndexPage('usertag', 'User Tag Index', ['ID', 'NAME', 'COUNT'], (tag) => [
-    tdH(hashlink('usertag', tag.id)),
-    tdH(tag.name),
-    tdH(tag.count),
+    hashlink('usertag', tag.id),
+    tag.name,
+    tag.count,
 ]);
 onLoadDetailPage('usertag', 'User Tag Detail', (data) => {
     const table1 = tableS(
-        trS(thS('ID'), tdS(data.id)),
-        trS(thS('NAME'), tdS(data.name))
+        [thS('ID'), tdS(data.id)],
+        [thS('NAME'), tdS(data.name)]
     );
     const table2 = tableS(
-        trS(thS(`USERS (${data.users.length})`)),
-        trS(tdS([...data.users].map(linkUser).join(', ')))
+        [thS(`USERS (${data.users.length})`)],
+        [tdS([...data.users].map(linkUser).join(', '))]
     );
     return table1 + table2;
 });
@@ -184,10 +177,7 @@ onLoadDetailPage('usertag', 'User Tag Detail', (data) => {
 function hashlink(type: TYPE, id: string): string;
 function hashlink(type: TYPE, id: number, text?: string): string;
 function hashlink(type: TYPE, id: any, text = id) {
-    if (parseInt(id) < 0) {
-        return `<a>${text}</a>`;
-    }
-    return `<a href="#/${type}/${id}">${text}</a>`;
+    return `<a ${parseInt(id) < 0 ? '' : `href="#/${type}/${id}"`}>${text}</a>`;
 }
 function linkItem(id: string) {
     return hashlink('item', id);

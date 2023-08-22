@@ -49,7 +49,7 @@ export function onLoadIndexPage<T extends TYPE>(
     type: T,
     name: string,
     headers: string[],
-    handler: (data: IndexData[T]) => HTMLTableCellElement[]
+    handler: (data: IndexData[T]) => any[]
 ) {
     EVENT_TARGET.listen('loadindex', type, (event) => {
         loadPage(

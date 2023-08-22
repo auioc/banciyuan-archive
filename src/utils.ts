@@ -108,7 +108,7 @@ export function createIndexTable<T extends TYPE>(
     type: T,
     headers: string[],
     event: LoadIndexEvent<T>,
-    handler: (data: any) => HTMLTableCellElement[]
+    handler: (data: any) => any[]
 ) {
     const table = document.createElement('table');
     table.className = 'table index-table';
@@ -128,53 +128,57 @@ export function createIndexTable<T extends TYPE>(
     table.append(pageNav());
     table.append(trH(...headers.map((s) => thH(s))));
     event.data
-        .map((data) => trH(...handler(data)))
+        .map((data) => trH(...handler(data).map((html) => tdH(html))))
         .forEach((row) => table.append(row));
     table.append(pageNav());
     return table;
 }
 
-export function tableH(headers: string[], rows: HTMLTableRowElement[]) {
-    const table = document.createElement('table');
-    table.className = 'table';
-    if (headers) {
-        table.append(trH(...headers.map((s) => thH(s))));
-    }
-    if (rows) {
-        rows.forEach((row) => table.append(row));
-    }
-    return table;
-}
-export function tableS(...rows: string[]) {
-    return '<table class="table"><tbody>' + rows.join('') + '</tbody></table>';
+export function tableS(...rows: string[][]) {
+    return (
+        '<table class="table"><tbody>' +
+        rows.map(trS).join('') +
+        '</tbody></table>'
+    );
 }
 
-export function trH(...cells: HTMLTableCellElement[]) {
+function trH(...cells: HTMLTableCellElement[]) {
     const tr = document.createElement('tr');
     tr.append(...cells);
     return tr;
 }
-export function tdH(html: any, colSpan = 0, rowSpan = 0) {
-    const td = document.createElement('td');
-    td.innerHTML = html;
-    if (colSpan) td.colSpan = colSpan;
-    if (rowSpan) td.rowSpan = rowSpan;
-    return td;
+function tCellH(html: any, header: boolean, colSpan = 0, rowSpan = 0) {
+    const cell = document.createElement(header ? 'th' : 'td');
+    cell.innerHTML = html;
+    if (colSpan) cell.colSpan = colSpan;
+    if (rowSpan) cell.rowSpan = rowSpan;
+    return cell;
 }
-export function thH(html: any, colSpan = 0, rowSpan = 0) {
-    const th = document.createElement('th');
-    th.innerHTML = html;
-    if (colSpan) th.colSpan = colSpan;
-    if (rowSpan) th.rowSpan = rowSpan;
-    return th;
+function tdH(html: any, colSpan = 0) {
+    return tCellH(html, false, colSpan);
+}
+function thH(html: any) {
+    return tCellH(html, true);
 }
 
-export function trS(...cells: string[]) {
+function trS(cells: string[]) {
     return '<tr>' + cells.join('') + '</tr>';
 }
-export function tdS(text: any) {
-    return '<td>' + text + '</td>';
+function tCellHS(text: any, header: boolean, colSpan = 0, rowSpan = 0) {
+    const tag = header ? 'th' : 'td';
+    return (
+        `<${tag}` +
+        (colSpan ? ` colspan="${colSpan}"` : '') +
+        (rowSpan ? ` rowspan="${rowSpan}"` : '') +
+        `>${text}</${tag}>`
+    );
 }
-export function thS(text: any) {
-    return '<th>' + text + '</th>';
+export function tdS(text: any, colSpan = 0) {
+    return tCellHS(text, false, colSpan);
+}
+export function thS(text: any, colSpan = 0) {
+    return tCellHS(text, true, colSpan);
+}
+export function tcRS(header: boolean, ...text: any[]) {
+    return text.map((t) => (header ? thS : tdS)(t));
 }
