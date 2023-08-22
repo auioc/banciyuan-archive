@@ -7,8 +7,8 @@ import { hashpath, loadPage } from './utils';
 
 declare global {
     interface Window {
-        REPO: string;
-        DATA_BASE_URL: string;
+        readonly REPO: string;
+        readonly DATA_URL: string;
     }
 }
 

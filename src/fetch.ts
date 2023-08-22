@@ -102,7 +102,7 @@ export async function loadIndex<T extends TYPE>(
     type: T,
     callback: (data: IndexData[T][]) => void
 ) {
-    await httpget(`${window.DATA_BASE_URL}/${type}s/index.tsv`, {}, (text) => {
+    await httpget(`${window.DATA_URL}/${type}s/index.tsv`, {}, (text) => {
         callback(parseTsv(text, INDEX_HANDLERS[type]));
     });
 }
@@ -112,7 +112,7 @@ export async function loadDetail<T extends TYPE>(
     id: string,
     callback: (data: DetailData[T]) => void
 ) {
-    await httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
+    await httpget(`${window.DATA_URL}/${type}s/${id}.json`, {}, (text) => {
         callback(JSON.parse(text));
     });
 }

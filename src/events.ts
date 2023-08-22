@@ -7,9 +7,9 @@ type EventType<T extends TYPE> = {
 };
 
 export class LoadIndexEvent<T extends TYPE> extends Event {
-    data;
-    page;
-    pages;
+    readonly data;
+    readonly page;
+    readonly pages;
     constructor(type: T, data: IndexData[T][], page: number, pages: number) {
         super(`loadindex${type}`);
         this.data = data;
@@ -19,8 +19,8 @@ export class LoadIndexEvent<T extends TYPE> extends Event {
 }
 
 export class LoadDetailEvent<T extends TYPE> extends Event {
-    id;
-    data;
+    readonly id;
+    readonly data;
     constructor(type: T, id: string, data: DetailData[T]) {
         super(`loaddetail${type}`);
         this.id = id;
