@@ -6,3 +6,5 @@ temp
 node_modules
 
 assets/bundle.js
+
+public

@@ -30,22 +30,18 @@ jobs:
                   node-version: '18'
                   cache: 'npm'
 
-            - name: Node Build
+            - name: Build
               run: |
-                  npm install --only=dev
-                  npm run build
+                  chmod +x ./build.sh
+                  ./build.sh
 
             - name: Archive Artifact
               shell: sh
               run: |
                   tar \
                     --dereference --hard-dereference \
-                    --directory "." \
+                    --directory "./public" \
                     -cvf "$RUNNER_TEMP/artifact.tar" \
-                    --exclude=.git \
-                    --exclude=.github \
-                    --exclude=.vscode \
-                    --exclude=node_modules \
                     .
 
             - name: Upload Artifact
