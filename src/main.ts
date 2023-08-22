@@ -1,11 +1,6 @@
-import {
-    getDetailCache,
-    getIndexCache,
-    loadIndexCache,
-    setDetailCache,
-} from './cache';
+import { createIndexCache, getDetail, getIndex, getReadme } from './data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
-import { ABORT_CONTROLLER, httpget, loadGitHubReadme } from './fetch';
+import { ABORT_CONTROLLER } from './fetch';
 import { initHandlers } from './handlers';
 import { TYPE } from './types';
 import { hashpath, loadPage } from './utils';
@@ -25,33 +20,23 @@ const REGEX_PATH = /^\/(item|user|itemtag|usertag)\/(\?page=)?(\d*)$/;
 const REGEX_PAGE = /^\?page=(\d*)$/;
 
 function loadIndex<T extends TYPE>(type: T, page = 1) {
-    const cache = getIndexCache(type);
-    if (cache) {
-        const _page = page - 1;
-        const chunked = cache.chunked;
-        if (_page >= 0 && _page < chunked.length) {
-            EVENT_TARGET.dispatchEvent(
-                new LoadIndexEvent(type, chunked[_page], page, chunked.length)
-            );
-        } else {
-            alert('Invalid page: ' + page);
-            hashpath('/' + type + '/?page=1');
-        }
+    const data = getIndex(type);
+    const _page = page - 1;
+    const chunked = data.chunked;
+    if (_page >= 0 && _page < chunked.length) {
+        EVENT_TARGET.dispatchEvent(
+            new LoadIndexEvent(type, chunked[_page], page, chunked.length)
+        );
     } else {
-        alert('ERROR');
+        alert('Invalid page: ' + page);
+        hashpath('/' + type + '/?page=1');
     }
 }
 
 function loadDetail(type: TYPE, id: string) {
-    const cache = getDetailCache(type, id);
-    if (cache) {
-        EVENT_TARGET.dispatchEvent(new LoadDetailEvent(type, id, cache));
-    } else {
-        httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
-            setDetailCache(type, id, JSON.parse(text));
-            loadDetail(type, id);
-        });
-    }
+    getDetail(type, id).then((data) =>
+        EVENT_TARGET.dispatchEvent(new LoadDetailEvent(type, id, data))
+    );
 }
 
 function hashChange() {
@@ -60,9 +45,8 @@ function hashChange() {
     ABORT_CONTROLLER.abort();
     loadPage('Loading...');
     if (path === '/') {
-        console.debug('load homepage');
         loadPage('Loading Readme...');
-        loadGitHubReadme(window.REPO, loadPage);
+        getReadme(window.REPO).then(loadPage);
         return;
     }
     if (!REGEX_PATH.test(path)) {
@@ -90,7 +74,7 @@ function hashChange() {
 (async () => {
     if (!hashpath()) hashpath('/');
     loadPage('Initializing...');
-    await loadIndexCache();
+    await createIndexCache();
     hashChange();
     window.addEventListener('hashchange', hashChange);
 })();

@@ -1,4 +1,6 @@
-import { formatSize, hashpath, loadPage, percentage } from './utils';
+import { INDEX_HANDLERS } from './handlers';
+import { DetailData, IndexData, TYPE } from './types';
+import { formatSize, hashpath, loadPage, parseTsv, percentage } from './utils';
 
 export class NotOkResponseError extends Error {
     status;
@@ -85,13 +87,32 @@ export async function httpget(
     }
 }
 
-export function loadGitHubReadme(
+export async function loadReadme(
     repo: string,
     callback: (html: string) => void
 ) {
-    httpget(
+    await httpget(
         `https://api.github.com/repos/${repo}/readme`,
         { headers: { Accept: 'application/vnd.github.html' } },
         callback
     );
+}
+
+export async function loadIndex<T extends TYPE>(
+    type: T,
+    callback: (data: IndexData[T][]) => void
+) {
+    await httpget(`${window.DATA_BASE_URL}/${type}s/index.tsv`, {}, (text) => {
+        callback(parseTsv(text, INDEX_HANDLERS[type]));
+    });
+}
+
+export async function loadDetail<T extends TYPE>(
+    type: T,
+    id: string,
+    callback: (data: DetailData[T]) => void
+) {
+    await httpget(`${window.DATA_BASE_URL}/${type}s/${id}.json`, {}, (text) => {
+        callback(JSON.parse(text));
+    });
 }

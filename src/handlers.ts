@@ -1,4 +1,4 @@
-import { getIndexCache } from './cache';
+import { getIndex } from './data';
 import { onLoadDetailPage, onLoadIndexPage } from './events';
 import { IndexData, TYPE } from './types';
 import { formatSize, formatTime, tableS, tdH, tdS, thS, trS } from './utils';
@@ -69,11 +69,7 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
             thS('TAGS'),
             `<td colspan="3">${[...data.tags]
                 .map((id) =>
-                    hashlink(
-                        'itemtag',
-                        id,
-                        getIndexCache('itemtag').dict[id].name
-                    )
+                    hashlink('itemtag', id, getIndex('itemtag').dict[id].name)
                 )
                 .join(',&nbsp;')}</td>`
         ),
@@ -130,7 +126,7 @@ onLoadDetailPage('user', 'User Detail', (data) => {
                         hashlink(
                             'usertag',
                             id,
-                            getIndexCache('usertag').dict[id].name
+                            getIndex('usertag').dict[id].name
                         )
                     )
                     .join(',&nbsp;')
@@ -197,5 +193,5 @@ function linkItem(id: string) {
     return hashlink('item', id);
 }
 function linkUser(id: number) {
-    return hashlink('user', id, getIndexCache('user').dict[id].name);
+    return hashlink('user', id, getIndex('user').dict[id].name);
 }
