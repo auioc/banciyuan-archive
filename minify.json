@@ -1,4 +1,0 @@
-{
-    "compress": { "pure_funcs": ["console.debug"] },
-    "ecma": 2017
-}
