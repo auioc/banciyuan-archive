@@ -20,6 +20,10 @@ export function percentage(a: number, b = 100, dp = 2) {
     return ((a / b) * 100).toFixed(dp);
 }
 
+export function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function formatTime(ts: number) {
     if (ts <= 0) {
         return '0';
@@ -54,6 +58,12 @@ export function formatSize(bytes: number, iec = true, dp = 2) {
         u < units.length - 1
     );
     return bytes.toFixed(dp) + ' ' + units[u];
+}
+
+export function progress(received: number, length: number) {
+    const s = formatSize(received) + (length ? ' / ' + formatSize(length) : '');
+    const p = length ? '@ ' + percentage(received, length) + '%' : '';
+    return `${s} ${p}`;
 }
 
 export function parseTsv<T>(
@@ -132,6 +142,22 @@ export function createIndexTable<T extends TYPE>(
         .forEach((row) => table.append(row));
     table.append(pageNav());
     return table;
+}
+
+export function span(id?: string) {
+    const span = document.createElement('span');
+    if (id) {
+        span.id = id;
+    }
+    return span;
+}
+
+export function div(children?: (string | Node)[]) {
+    const div = document.createElement('div');
+    if (children) {
+        div.append(...children);
+    }
+    return div;
 }
 
 export function tableS(...rows: string[][]) {

@@ -1,7 +1,7 @@
 import { loadDetail, loadIndex, loadReadme } from './fetch';
 import { TYPES } from './main';
 import { DetailData, IndexData, TYPE } from './types';
-import { chunkArray } from './utils';
+import { chunkArray, div, loadPage, progress, sleep, span } from './utils';
 
 // ========================================================================== //
 
@@ -26,9 +26,25 @@ function setIndexCache<T extends TYPE>(type: T, data: IndexData[T][]) {
 }
 
 export async function createIndexCache() {
+    const elements = [];
+    const funcs = [];
     for (const type of TYPES) {
-        await loadIndex(type, (data) => setIndexCache(type, data));
+        const progressEl = span('feteching-index-' + type);
+        elements.push(div([`Fetching ${type} index... `, progressEl]));
+        funcs.push(
+            loadIndex(
+                type,
+                (data) => {
+                    setIndexCache(type, data);
+                    progressEl.innerText = 'OK';
+                },
+                (r, l) => (progressEl.innerText = progress(r, l))
+            )
+        );
     }
+    loadPage(div(elements));
+    await Promise.all(funcs);
+    await sleep(50);
 }
 
 export function getIndex<T extends TYPE>(type: T) {

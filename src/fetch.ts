@@ -1,6 +1,6 @@
 import { INDEX_HANDLERS } from './handlers';
 import { DetailData, IndexData, TYPE } from './types';
-import { formatSize, hashpath, loadPage, parseTsv, percentage } from './utils';
+import { hashpath, loadPage, parseTsv, progress } from './utils';
 
 export class NotOkResponseError extends Error {
     status;
@@ -12,13 +12,13 @@ export class NotOkResponseError extends Error {
     }
 }
 
-export let ABORT_CONTROLLER = new AbortController();
+let ABORT_CONTROLLER = new AbortController();
 
-let _acceptCompressed = true;
-
-export function acceptCompressed(accept: boolean) {
-    _acceptCompressed = accept;
+export function abortFetch() {
+    ABORT_CONTROLLER.abort();
 }
+
+let _acceptCompressed = true; // TODO
 
 export function onFetchError(error: Error) {
     console.error(error, { error });
@@ -31,10 +31,8 @@ export function onFetchError(error: Error) {
     }
 }
 
-export function onFetchProgress(received: number, length: number) {
-    const s = formatSize(received) + (length ? ' / ' + formatSize(length) : '');
-    const p = length ? '@ ' + percentage(received, length) + '%' : '';
-    loadPage(`Fetching... ${s} ${p}`);
+function onFetchProgress(received: number, length: number) {
+    loadPage('Fetching... ' + progress(received, length));
 }
 
 export async function httpget(
@@ -100,11 +98,18 @@ export async function loadReadme(
 
 export async function loadIndex<T extends TYPE>(
     type: T,
-    callback: (data: IndexData[T][]) => void
+    callback: (data: IndexData[T][]) => void,
+    onprogress: (received: number, length: number) => void
 ) {
-    await httpget(`${window.DATA_URL}/${type}s/index.tsv`, {}, (text) => {
-        callback(parseTsv(text, INDEX_HANDLERS[type]));
-    });
+    await httpget(
+        `${window.DATA_URL}/${type}s/index.tsv`,
+        {},
+        (text) => callback(parseTsv(text, INDEX_HANDLERS[type])),
+        (error) => {
+            throw error;
+        },
+        onprogress
+    );
 }
 
 export async function loadDetail<T extends TYPE>(

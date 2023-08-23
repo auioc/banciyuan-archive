@@ -1,7 +1,7 @@
 import { busuanzi } from './busuanzi';
 import { createIndexCache, getDetail, getIndex, getReadme } from './data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
-import { ABORT_CONTROLLER } from './fetch';
+import { abortFetch } from './fetch';
 import { initHandlers } from './handlers';
 import { TYPE } from './types';
 import { hashpath, loadPage } from './utils';
@@ -43,7 +43,7 @@ function loadDetail(type: TYPE, id: string) {
 function hashChange() {
     const path = hashpath();
     console.debug('hash change:', path);
-    ABORT_CONTROLLER.abort();
+    abortFetch();
     loadPage('Loading...');
     if (path === '/') {
         loadPage('Loading Readme...');
@@ -77,7 +77,13 @@ function hashChange() {
 (async () => {
     if (!hashpath()) hashpath('/');
     loadPage('Initializing...');
-    await createIndexCache();
+    try {
+        await createIndexCache();
+    } catch (error) {
+        console.error(error);
+        loadPage('Failed to initialize!<br/>' + error);
+        return;
+    }
     hashChange();
     window.addEventListener('hashchange', hashChange);
 })();
