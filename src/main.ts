@@ -1,3 +1,4 @@
+import { busuanzi } from './busuanzi';
 import { createIndexCache, getDetail, getIndex, getReadme } from './data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
 import { ABORT_CONTROLLER } from './fetch';
@@ -46,6 +47,7 @@ function hashChange() {
     loadPage('Loading...');
     if (path === '/') {
         loadPage('Loading Readme...');
+        busuanzi();
         getReadme(window.REPO).then(loadPage);
         return;
     }
@@ -64,6 +66,7 @@ function hashChange() {
         hashpath(path + '?page=1');
         return;
     }
+    busuanzi();
     if (REGEX_PAGE.test(param)) {
         loadIndex(type, parseInt(param.slice(6)));
     } else {
