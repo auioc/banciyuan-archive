@@ -1,6 +1,4 @@
-import { INDEX_HANDLERS } from './handlers';
-import { DetailData, IndexData, TYPE } from './types';
-import { hashpath, loadPage, parseTsv, progress } from './utils';
+import { hashpath, loadPage, progress } from './utils';
 
 export class NotOkResponseError extends Error {
     status;
@@ -37,8 +35,8 @@ function onFetchProgress(received: number, length: number) {
 
 export async function httpget(
     url: string,
-    options: RequestInit,
-    callback: (text: string) => void,
+    options: RequestInit = {},
+    callback = (text: string) => {},
     onerror = onFetchError,
     onprogress = onFetchProgress
 ) {
@@ -80,8 +78,10 @@ export async function httpget(
 
         const text = new TextDecoder('utf-8').decode(chunksAll);
         callback(text);
+        return text;
     } catch (error) {
         onerror(error);
+        throw error;
     }
 }
 
@@ -96,28 +96,6 @@ export async function loadReadme(
     );
 }
 
-export async function loadIndex<T extends TYPE>(
-    type: T,
-    callback: (data: IndexData[T][]) => void,
-    onprogress: (received: number, length: number) => void
-) {
-    await httpget(
-        `${window.DATA_URL}/${type}s/index.tsv`,
-        {},
-        (text) => callback(parseTsv(text, INDEX_HANDLERS[type])),
-        (error) => {
-            throw error;
-        },
-        onprogress
-    );
-}
-
-export async function loadDetail<T extends TYPE>(
-    type: T,
-    id: string,
-    callback: (data: DetailData[T]) => void
-) {
-    await httpget(`${window.DATA_URL}/${type}s/${id}.json`, {}, (text) => {
-        callback(JSON.parse(text));
-    });
+export async function getDataVersion() {
+    return parseInt(await httpget(`${window.DATA_URL}/version`, {}));
 }

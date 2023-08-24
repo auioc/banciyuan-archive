@@ -1,7 +1,15 @@
 import { getIndex } from './data';
 import { onLoadDetailPage, onLoadIndexPage } from './events';
-import { IndexData, TYPE } from './types';
-import { formatSize, formatTime, tableS, tcRS, tdS, thS } from './utils';
+import { ID, IndexData, TYPE } from './types';
+import {
+    formatSize,
+    formatTime,
+    parseTsv,
+    tableS,
+    tcRS,
+    tdS,
+    thS,
+} from './utils';
 
 export function initHandlers() {}
 
@@ -16,7 +24,14 @@ const sex = (i: number) => _kv(USER_SEX, i);
 const tagType = (i: number) => _kv(ITEM_TAG_TYPES, i);
 const imageFormat = (i: number) => _kv(IMAGE_FORMATS, i);
 
-export const INDEX_HANDLERS: {
+export function parseId<T extends TYPE>(type: T, id: string): ID<T> {
+    if (type === 'item') {
+        return id;
+    }
+    return parseInt(id);
+}
+
+const INDEX_HANDLERS: {
     [t in TYPE]: (h: string[], c: string[]) => IndexData[t];
 } = {
     item: (_, c) => ({
@@ -43,6 +58,10 @@ export const INDEX_HANDLERS: {
         count: parseInt(c[2]),
     }),
 };
+
+export function parseIndex<T extends TYPE>(type: T, tsv: string) {
+    return parseTsv(tsv, INDEX_HANDLERS[type]);
+}
 
 onLoadIndexPage(
     'item',

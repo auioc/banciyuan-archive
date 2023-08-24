@@ -1,7 +1,7 @@
 import { busuanzi } from './busuanzi';
 import { createIndexCache, getDetail, getIndex, getReadme } from './data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
-import { abortFetch } from './fetch';
+import { abortFetch, getDataVersion } from './fetch';
 import { initHandlers } from './handlers';
 import { TYPE } from './types';
 import { hashpath, loadPage } from './utils';
@@ -74,10 +74,13 @@ function hashChange() {
     }
 }
 
+export let DATA_VERSION = 0;
+
 (async () => {
     if (!hashpath()) hashpath('/');
     loadPage('Initializing...');
     try {
+        DATA_VERSION = await getDataVersion();
         await createIndexCache();
     } catch (error) {
         console.error(error);

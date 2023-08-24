@@ -3,7 +3,7 @@
         "alwaysStrict": true,
         "baseUrl": "./src",
         "esModuleInterop": true,
-        "lib": ["ES2017", "DOM"],
+        "lib": ["ES2017", "DOM", "DOM.Iterable"],
         "module": "CommonJS",
         "noImplicitAny": true,
         "noImplicitReturns": true,

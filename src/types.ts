@@ -30,6 +30,8 @@ export type IndexData = Readonly<{
     usertag: UserTagIndex;
 }>;
 
+export type ID<T extends TYPE> = IndexData[T]['id'];
+
 type ItemDetail = Readonly<{
     id: string;
     type: number;

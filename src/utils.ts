@@ -8,6 +8,10 @@ export function hashpath(path?: string) {
     return window.location.hash.replace(/^#/, '');
 }
 
+export function rethrow(error: Error) {
+    throw error;
+}
+
 export function chunkArray<T>(array: T[], size: number) {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
