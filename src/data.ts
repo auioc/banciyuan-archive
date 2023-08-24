@@ -2,46 +2,34 @@ import { httpget, loadReadme } from './fetch';
 import { parseId, parseIndex } from './handlers';
 import { DATA_VERSION, TYPES } from './main';
 import { DetailData, ID, IndexData, TYPE } from './types';
-import {
-    chunkArray,
-    div,
-    loadPage,
-    progress,
-    rethrow,
-    sleep,
-    span,
-} from './utils';
+import { chunkArray, div, loadPage, progress, sleep } from './utils';
 
 // ========================================================================== //
 
 const DB_NAME = 'banciyuan-archive';
-const DB_INDEX_CACHE_NAME = 'index';
+const DB_INDEX_CACHE = 'index';
 
-async function openDatabase() {
+async function database() {
     return new Promise((reslove: (db: IDBDatabase) => void, reject) => {
         const req = window.indexedDB.open(DB_NAME, DATA_VERSION);
-        req.onerror = (ev) => {
-            reject(ev);
-        };
+        req.onerror = reject;
         req.onupgradeneeded = (ev) => {
             console.debug('db upgrade', ev);
             const db = req.result;
             for (const name of db.objectStoreNames) {
                 db.deleteObjectStore(name);
             }
-            db.createObjectStore(DB_INDEX_CACHE_NAME);
+            db.createObjectStore(DB_INDEX_CACHE);
             for (const type of TYPES) {
                 db.createObjectStore(type, { keyPath: 'id' });
             }
         };
-        req.onsuccess = (_) => {
-            reslove(req.result);
-        };
+        req.onsuccess = (_) => reslove(req.result);
     });
 }
 
 async function objectStore(name: string, mode?: IDBTransactionMode) {
-    return openDatabase() //
+    return database() //
         .then(
             (db) =>
                 new Promise(
@@ -96,6 +84,8 @@ async function dbCacheOrFetch<T>(
     return data;
 }
 
+// ========================================================================== //
+
 type IndexCacheDict<T extends TYPE> = {
     [i in ID<T>]: IndexData[T];
 };
@@ -116,10 +106,10 @@ function setIndexCache<T extends TYPE>(type: T, data: IndexData[T][]) {
 
 async function loadIndex<T extends TYPE>(
     type: T,
-    progressCall: (progress: string) => void
+    updateProgress: (progress: string) => void
 ) {
     const tsv = await dbCacheOrFetch(
-        'index',
+        DB_INDEX_CACHE,
         type,
         false,
         async (_) => {
@@ -127,16 +117,14 @@ async function loadIndex<T extends TYPE>(
             const tsv = await httpget(
                 `${window.DATA_URL}/${type}s/index.tsv`,
                 {},
-                () => {},
-                rethrow,
-                (r, l) => progressCall(progress(r, l))
+                (r, l) => updateProgress(progress(r, l))
             );
-            progressCall('OK');
+            updateProgress('OK');
             return tsv;
         },
         () => {
             console.debug('hit db cache: index', type);
-            progressCall('Cached');
+            updateProgress('Cached');
         },
         () => {
             console.debug('update db cache: index', type);
@@ -150,7 +138,7 @@ export async function createIndexCache() {
     const elements = [];
     const funcs = [];
     for (const type of TYPES) {
-        const progressEl = span('load-index-' + type);
+        const progressEl = document.createElement('span');
         elements.push(div([`Loading ${type} index... `, progressEl]));
         funcs.push(
             loadIndex(type, (progress) => (progressEl.innerText = progress))
@@ -200,6 +188,6 @@ export async function getReadme(repo: string) {
     if (README_CACHE) {
         return README_CACHE;
     }
-    await loadReadme(repo, (html) => (README_CACHE = html));
-    return getReadme(repo);
+    README_CACHE = await loadReadme(repo);
+    return README_CACHE;
 }

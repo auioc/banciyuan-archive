@@ -36,64 +36,51 @@ function onFetchProgress(received: number, length: number) {
 export async function httpget(
     url: string,
     options: RequestInit = {},
-    callback = (text: string) => {},
-    onerror = onFetchError,
     onprogress = onFetchProgress
 ) {
     ABORT_CONTROLLER = new AbortController();
-    try {
-        const inti = {
-            ...{ signal: ABORT_CONTROLLER.signal },
-            ...options,
-        };
-        if (!_acceptCompressed) {
-            inti['headers'] = { ...inti['headers'], ...{ Range: 'bytes=0-' } };
-        }
-        const response = await fetch(url, inti);
-        if (!response.ok) {
-            throw new NotOkResponseError(response.status, response.statusText);
-        }
-
-        const reader = response.body.getReader();
-        const length = response.headers.get('Content-Encoding')
-            ? 0
-            : +response.headers.get('Content-Length');
-
-        let received = 0;
-        let chunks = [];
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            chunks.push(value);
-            received += value.length;
-            onprogress(received, length);
-        }
-
-        let chunksAll = new Uint8Array(received);
-        let position = 0;
-        for (let chunk of chunks) {
-            chunksAll.set(chunk, position);
-            position += chunk.length;
-        }
-
-        const text = new TextDecoder('utf-8').decode(chunksAll);
-        callback(text);
-        return text;
-    } catch (error) {
-        onerror(error);
-        throw error;
+    const inti = {
+        ...{ signal: ABORT_CONTROLLER.signal },
+        ...options,
+    };
+    if (!_acceptCompressed) {
+        inti['headers'] = { ...inti['headers'], ...{ Range: 'bytes=0-' } };
     }
+    const response = await fetch(url, inti);
+    if (!response.ok) {
+        throw new NotOkResponseError(response.status, response.statusText);
+    }
+
+    const reader = response.body.getReader();
+    const length = response.headers.get('Content-Encoding')
+        ? 0
+        : +response.headers.get('Content-Length');
+
+    let received = 0;
+    let chunks = [];
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        onprogress(received, length);
+    }
+
+    let chunksAll = new Uint8Array(received);
+    let position = 0;
+    for (let chunk of chunks) {
+        chunksAll.set(chunk, position);
+        position += chunk.length;
+    }
+
+    const text = new TextDecoder('utf-8').decode(chunksAll);
+    return text;
 }
 
-export async function loadReadme(
-    repo: string,
-    callback: (html: string) => void
-) {
-    await httpget(
-        `https://api.github.com/repos/${repo}/readme`,
-        { headers: { Accept: 'application/vnd.github.html' } },
-        callback
-    );
+export async function loadReadme(repo: string) {
+    return httpget(`https://api.github.com/repos/${repo}/readme`, {
+        headers: { Accept: 'application/vnd.github.html' },
+    });
 }
 
 export async function getDataVersion() {

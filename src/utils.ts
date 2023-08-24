@@ -148,14 +148,6 @@ export function createIndexTable<T extends TYPE>(
     return table;
 }
 
-export function span(id?: string) {
-    const span = document.createElement('span');
-    if (id) {
-        span.id = id;
-    }
-    return span;
-}
-
 export function div(children?: (string | Node)[]) {
     const div = document.createElement('div');
     if (children) {

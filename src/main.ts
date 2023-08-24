@@ -1,7 +1,7 @@
 import { busuanzi } from './busuanzi';
 import { createIndexCache, getDetail, getIndex, getReadme } from './data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
-import { abortFetch, getDataVersion } from './fetch';
+import { abortFetch, getDataVersion, onFetchError } from './fetch';
 import { initHandlers } from './handlers';
 import { TYPE } from './types';
 import { hashpath, loadPage } from './utils';
@@ -35,9 +35,11 @@ function loadIndex<T extends TYPE>(type: T, page = 1) {
 }
 
 function loadDetail(type: TYPE, id: string) {
-    getDetail(type, id).then((data) =>
-        EVENT_TARGET.dispatchEvent(new LoadDetailEvent(type, id, data))
-    );
+    getDetail(type, id)
+        .then((data) =>
+            EVENT_TARGET.dispatchEvent(new LoadDetailEvent(type, id, data))
+        )
+        .catch(onFetchError);
 }
 
 function hashChange() {
@@ -81,6 +83,7 @@ export let DATA_VERSION = 0;
     loadPage('Initializing...');
     try {
         DATA_VERSION = await getDataVersion();
+        console.debug('data version', DATA_VERSION);
         await createIndexCache();
     } catch (error) {
         console.error(error);
