@@ -14,7 +14,7 @@ body {
 header {
     border-bottom: 1px black solid;
     margin-bottom: 1em;
-    padding: 1em 5em 0.5em 5em;
+    padding: 1em 1em 0.5em 1em;
     text-align: center;
 }
 header h1,
@@ -33,7 +33,7 @@ footer {
     font-size: small;
     border-top: 1px black solid;
     margin-top: 1rem;
-    padding: 1em 5em;
+    padding: 1em;
 }
 
 main#main {
