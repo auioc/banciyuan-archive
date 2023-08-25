@@ -32,14 +32,16 @@ export function formatTime(ts: number) {
     if (ts <= 0) {
         return '0';
     }
-    let date = new Date(ts * 1000);
-    let y = date.getFullYear().toString();
-    let m = (date.getMonth() + 1).toString().padStart(2, '00');
-    let d = date.getDate().toString().padStart(2, '00');
-    let hh = date.getHours().toString().padStart(2, '00');
-    let mm = date.getMinutes().toString().padStart(2, '00');
-    let ss = date.getSeconds().toString().padStart(2, '00');
-    return y + '-' + m + '-' + d + ' ' + hh + ':' + mm + ':' + ss;
+    return new Date(ts * 1000).toLocaleString(navigator.language, {
+        weekday: 'narrow',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    });
 }
 
 const _SIZE_PREFIX = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
