@@ -1,11 +1,33 @@
 {
     "name": "banciyuan-archive",
-    "version": "1.0.0",
-    "description": "",
+    "version": "1.1.0",
+    "description": "BanCiYuan Archive Project Website",
     "scripts": {
         "watch": "watchify src/main.ts --debug -p tsify -o assets/bundle.js"
     },
-    "author": "",
+    "author": {
+        "name": "LainIO24",
+        "email": "lainio24@outlook.com",
+        "url": "https://github.com/lainio24"
+    },
+    "contributors": [
+        {
+            "name": "WakelessSloth56",
+            "url": "https://github.com/WakelessSloth56"
+        },
+        {
+            "name": "CamHex"
+        },
+        {
+            "name": "PCC-Studio",
+            "url": "https://www.pccstudio.com"
+        }
+    ],
+    "homepage": "https://hi.auioc.org/banciyuan-archive/",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:auioc/banciyuan-archive.git"
+    },
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
         "browserify": "^17.0.0",
