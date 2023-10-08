@@ -46,3 +46,8 @@
 
 - 如果你拥有本项目没有存档的更多的数据，欢迎通过[议题](https://github.com/auioc/banciyuan-archive/issues)与我们联系。
 - 对于网站，你可以通过[拉取请求](https://github.com/auioc/banciyuan-archive/pulls)来改进。
+
+## 许可证
+本项目：
+- [网站](https://github.com/auioc/banciyuan-archive)采用 **GNU Affero通用公共许可协证 v3.0** 授权。
+- [数据](https://github.com/auioc/banciyuan-archive-data)采用 **CC0许可协议**，属于公有领域。
