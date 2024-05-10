@@ -10,7 +10,7 @@ const DB_NAME = 'banciyuan-archive';
 const DB_INDEX_CACHE = 'index';
 
 async function database() {
-    return new Promise((reslove: (db: IDBDatabase) => void, reject) => {
+    return new Promise((resolve: (db: IDBDatabase) => void, reject) => {
         const req = window.indexedDB.open(DB_NAME, DATA_VERSION);
         req.onerror = reject;
         req.onupgradeneeded = (ev) => {
@@ -24,7 +24,7 @@ async function database() {
                 db.createObjectStore(type, { keyPath: 'id' });
             }
         };
-        req.onsuccess = (_) => reslove(req.result);
+        req.onsuccess = (_) => resolve(req.result);
     });
 }
 
@@ -34,11 +34,11 @@ async function objectStore(name: string, mode?: IDBTransactionMode) {
             (db) =>
                 new Promise(
                     (
-                        reslove: (db: IDBObjectStore) => void,
+                        resolve: (db: IDBObjectStore) => void,
                         reject //
                     ) => {
                         const tr = db.transaction(name, mode);
-                        reslove(tr.objectStore(name));
+                        resolve(tr.objectStore(name));
                         tr.onerror = reject;
                     }
                 )
@@ -46,18 +46,18 @@ async function objectStore(name: string, mode?: IDBTransactionMode) {
 }
 
 async function dbGet(store: IDBObjectStore, key: IDBValidKey | IDBKeyRange) {
-    return new Promise((reslove: (db: any) => void, reject) => {
+    return new Promise((resolve: (db: any) => void, reject) => {
         const res = store.get(key);
         res.onerror = reject;
-        res.onsuccess = (_) => reslove(res.result);
+        res.onsuccess = (_) => resolve(res.result);
     });
 }
 
 async function dbPut(store: IDBObjectStore, value: any, key?: IDBValidKey) {
-    return new Promise((reslove: (db: IDBValidKey) => void, reject) => {
+    return new Promise((resolve: (db: IDBValidKey) => void, reject) => {
         const res = store.put(value, key);
         res.onerror = reject;
-        res.onsuccess = (_) => reslove(res.result);
+        res.onsuccess = (_) => resolve(res.result);
     });
 }
 
