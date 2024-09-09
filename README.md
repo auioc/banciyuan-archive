@@ -37,8 +37,8 @@
 ## 致谢
 
 - [AUIOC](https://www.auioc.com)：技术支持
-- [PCC-Studio](https://www.pccstudio.com)：数据收集、文件存储
-- CamHex：数据整理、文件备份
+- [PCC-Studio](https://www.pccstudio.com)：数据收集、 ~~文件存储~~
+- [@CamHex](https://github.com/camhex)：数据整理、文件存储、备份
 
 ## 参与贡献
 
