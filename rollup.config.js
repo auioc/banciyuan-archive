@@ -1,9 +1,13 @@
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 
-const dev = process.env.NODE_ENV !== 'production';
+const dev = process.env.BUILD === 'development';
 
-const terserOptions = { compress: { pure_funcs: ['console.debug'] } };
+const terserOptions = {
+    compress: {
+        // pure_funcs: ['console.debug'],
+    },
+};
 
 export default [
     {
