@@ -83,6 +83,6 @@ export async function loadReadme(repo: string) {
     });
 }
 
-export async function getDataVersion() {
+export async function fetchDataVersion() {
     return parseInt(await httpget(`${window.DATA_URL}/version`, {}));
 }

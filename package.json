@@ -2,8 +2,15 @@
     "name": "banciyuan-archive",
     "version": "1.1.0",
     "description": "BanCiYuan Archive Project Website",
+    "type": "module",
     "scripts": {
-        "watch": "watchify src/main.ts --debug -p tsify -o assets/bundle.js"
+        "watch:script": "rollup -c --environment BUILD:development --watch",
+        "watch:others": "onchange -i src/*.* -- copyfiles --flat src/*.* public",
+        "watch": "pnpm run --parallel \"/^watch:.*/\"",
+        "build:script": "rollup -c",
+        "build:html": "html-minifier-terser --minify-js --collapse-whitespace --remove-comments src/index.html > public/index.html",
+        "build:css": "html-minifier-terser --collapse-whitespace --remove-comments src/main.css > public/main.css",
+        "build": "pnpm run --parallel \"/^build:.*/\""
     },
     "author": {
         "name": "LainIO24",
@@ -30,10 +37,14 @@
     },
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
-        "browserify": "^17.0.0",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^11.1.6",
+        "copyfiles": "^2.4.1",
         "html-minifier-terser": "^7.2.0",
+        "onchange": "^7.1.0",
+        "rollup": "^4.21.2",
         "terser": "^5.19.2",
-        "tsify": "^5.0.4",
+        "tslib": "^2.7.0",
         "typescript": "^5.1.6"
     }
 }

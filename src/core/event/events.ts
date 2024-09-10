@@ -1,5 +1,5 @@
-import { DetailData, IndexData, TYPE } from './types';
-import { createIndexTable, loadPage } from './utils';
+import { DetailData, IndexData, TYPE } from '../types';
+import { createIndexTable, loadPage } from '../utils/utils';
 
 type EventType<T extends TYPE> = {
     loadindex: LoadIndexEvent<T>;

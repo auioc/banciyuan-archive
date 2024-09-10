@@ -1,10 +1,7 @@
 temp
 
-*.db*
-*.py
-
 node_modules
 
-assets/bundle.js
+dist
 
 public

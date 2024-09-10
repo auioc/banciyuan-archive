@@ -1,21 +1,9 @@
-import { busuanzi } from './busuanzi';
-import { createIndexCache, getDetail, getIndex, getReadme } from './data';
-import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './events';
-import { abortFetch, getDataVersion, onFetchError } from './fetch';
-import { initHandlers } from './handlers';
+import { getDetail, getIndex, getReadme } from './data/data';
+import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './event/events';
 import { TYPE } from './types';
-import { hashpath, loadPage } from './utils';
-
-declare global {
-    interface Window {
-        readonly REPO: string;
-        readonly DATA_URL: string;
-    }
-}
-
-export const TYPES: TYPE[] = ['item', 'itemtag', 'user', 'usertag'];
-
-initHandlers();
+import { busuanzi } from './utils/busuanzi';
+import { abortFetch, onFetchError } from './utils/fetch';
+import { hashpath, loadPage } from './utils/utils';
 
 const REGEX_PATH = /^\/(item|user|itemtag|usertag)\/(\?page=)?(\d*)$/;
 const REGEX_PAGE = /^\?page=(\d*)$/;
@@ -42,7 +30,7 @@ function loadDetail(type: TYPE, id: string) {
         .catch(onFetchError);
 }
 
-function hashChange() {
+export default function hashChange() {
     const path = hashpath();
     console.debug('hash change:', path);
     abortFetch();
@@ -50,7 +38,7 @@ function hashChange() {
     if (path === '/') {
         loadPage('Loading Readme...');
         busuanzi();
-        getReadme(window.REPO).then(loadPage);
+        getReadme().then(loadPage);
         return;
     }
     if (!REGEX_PATH.test(path)) {
@@ -75,21 +63,3 @@ function hashChange() {
         loadDetail(type, param);
     }
 }
-
-export let DATA_VERSION = 0;
-
-(async () => {
-    if (!hashpath()) hashpath('/');
-    loadPage('Initializing...');
-    try {
-        DATA_VERSION = await getDataVersion();
-        console.debug('data version', DATA_VERSION);
-        await createIndexCache();
-    } catch (error) {
-        console.error(error);
-        loadPage('Failed to initialize!<br/>' + error);
-        return;
-    }
-    hashChange();
-    window.addEventListener('hashchange', hashChange);
-})();

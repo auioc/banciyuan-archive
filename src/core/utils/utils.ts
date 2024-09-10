@@ -1,5 +1,5 @@
-import { LoadIndexEvent } from './events';
-import { TYPE } from './types';
+import { LoadIndexEvent } from '../event/events';
+import { TYPE } from '../types';
 
 export function hashpath(path?: string) {
     if (path) {

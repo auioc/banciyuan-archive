@@ -18,11 +18,11 @@ export function busuanzi() {
     script.src = jsonp + callbackName;
     script.referrerPolicy = 'no-referrer-when-downgrade';
     document.getElementsByTagName('head')[0].appendChild(script);
-    // @ts-expect-error
+    //@ts-expect-error
     window[callbackName] = async (data: BusuanziData) => {
         callback(data);
         document.getElementById(callbackName).remove();
-        // @ts-expect-error
+        //@ts-expect-error
         delete window[callbackName];
     };
 }
