@@ -1,7 +1,7 @@
+import busuanzi from 'utils/busuanzi';
 import { getDetail, getIndex, getReadme } from './data/data';
 import { EVENT_TARGET, LoadDetailEvent, LoadIndexEvent } from './event/events';
 import { TYPE } from './types';
-import { busuanzi } from './utils/busuanzi';
 import { abortFetch, onFetchError } from './utils/fetch';
 import { hashpath, loadPage } from './utils/utils';
 

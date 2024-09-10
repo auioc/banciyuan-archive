@@ -28,11 +28,15 @@
         </main>
         <footer>
             <div>
-                PV: <span id="busuanzi_value_site_pv">N/A</span>
-                <span>&emsp;&dot;&emsp;</span>
-                <span>Powered by </span>
-                <a href="https://github.com/auioc" target="_blank">AUIOC</a>
-                <span>&emsp;&dot;&emsp;</span>
+                <span>SitePV:</span>
+                <span id="busuanzi_value_site_pv">N/A</span>
+                <span>, SiteUV:</span>
+                <span id="busuanzi_value_site_uv">N/A</span>
+                <span>, PagePV:</span>
+                <span id="busuanzi_value_page_pv">N/A</span>
+                <span>&emsp;-&emsp;</span>
+                <a href="https://www.auioc.org" target="_blank">AUIOC.ORG</a>
+                <span>&emsp;-&emsp;</span>
                 <a
                     href="https://github.com/auioc/banciyuan-archive"
                     target="_blank"
@@ -43,7 +47,7 @@
         <script>
             window.REPO = 'auioc/banciyuan-archive';
             window.DATA_URL =
-                window.location.hostname === '127.0.0.1'
+                window.location.hostname === '127.0.0.2'
                     ? '//127.0.0.1:8080/banciyuan-archive-data'
                     : 'https://hi.auioc.org/banciyuan-archive-data';
         </script>
