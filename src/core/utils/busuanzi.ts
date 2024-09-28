@@ -7,7 +7,18 @@ type Data = {
     readonly [k in (typeof keys)[number]]: number;
 };
 
+function forEachKey(f: (key: (typeof keys)[number]) => string) {
+    for (const key of keys) {
+        const element = document.getElementById(prefix + key);
+        if (element) {
+            element.innerHTML = f(key);
+        }
+    }
+}
+
 export default async function busuanzi() {
+    forEachKey((_) => '?');
+
     const page = window.location.href.replace('#', 'H').replace('?', '/');
     const data: Data = await fetch(busuanzi_url, {
         method: 'POST',
@@ -16,12 +27,6 @@ export default async function busuanzi() {
         },
         body: JSON.stringify({ url: page }),
     }).then((res) => res.json());
-
-    console.debug('busuanzi', data);
-    for (const key of keys) {
-        const element = document.getElementById(prefix + key);
-        if (element) {
-            element.innerHTML = '' + data[key];
-        }
-    }
+    console.debug('busuanzi', window.location.hash, data);
+    forEachKey((key) => '' + data[key]);
 }
