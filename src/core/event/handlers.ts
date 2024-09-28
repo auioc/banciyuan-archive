@@ -56,18 +56,20 @@ onLoadDetailPage('item', 'Item Detail', (data) => {
     const table2 = tableS(
         [thS(`IMAGES (${data.images.length})`, 6)],
         tcRS(true, 'ID', 'NAME', 'FORMAT', 'WIDTH', 'HEIGHT', 'SIZE'),
-        ...(() =>
-            [...data.images].map((image) =>
-                tcRS(
-                    false,
-                    image.id < 0 ? '' : image.id,
-                    image.name,
-                    imageFormat(image.format),
-                    image.w > 0 ? image.w : '',
-                    image.h > 0 ? image.h : '',
-                    image.size > 0 ? formatSize(image.size) : ''
-                )
-            ))()
+        ...[...data.images].map((image) =>
+            tcRS(
+                false,
+                image.id < 0 ? '' : image.id,
+                image.name,
+                imageFormat(image.format),
+                image.w > 0 ? image.w : '',
+                image.h > 0 ? image.h : '',
+                image.size > 0 ? formatSize(image.size) : ''
+            )
+        ),
+        ((s) => (s > 0 ? [tdS('', 5), tdS(`<b>${formatSize(s)}</b>`)] : []))(
+            data.images.reduce((acc, { size }) => acc + size, 0)
+        )
     );
     return table1 + table2;
 });
